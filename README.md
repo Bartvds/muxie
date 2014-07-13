@@ -10,13 +10,15 @@ Simple uni-directional stream multiplexer: send streams over a stream. Handy for
 
 ## Note
 
-- Currently there is an upper limit of 255 active streams
+- Currently there is an upper limit of 255 active streams.
 - To send objects use JSON streams for simple objects, [Buffo](https://github.com/Bartvds/buffo) to stream all native JavaScript types, or any other object encoder of your choice.
 
 
 ## Alternatives
 
-I've used [multiplex](https://www.npmjs.org/package/multiplex) for some time, but had some weird decoding issues. Then the recursive decoding broke my stack when streaming large amounts of very small chunks. I could't find how to fix this in the more complex logic and it's dependencies. I created mplex to mirror the same API but with a simpler (naïve?) implementation.
+I've used [multiplex](https://www.npmjs.org/package/multiplex) for some time, but had some weird decoding issues. As a bonus the recursive decoding broke my stack when streaming large amounts of very small chunks. I could't find how to fix this in the more complex logic and it's dependencies.
+
+Since I don't need duplex functionality I created mplex to mirror the same API but with a simpler (naïve?) implementation.
 
 
 ## Todo
@@ -38,6 +40,7 @@ var mplex = require('mplex');
 
 // create a demuxer that will receive new streams
 var demux = mplex.demuxer(function (stream, name) {
+	// received a new readable stream
 	stream.on('data', function(err) {
 		//
 	});
@@ -46,10 +49,10 @@ var demux = mplex.demuxer(function (stream, name) {
 // create muxer
 var mux = mplex.muxer();
 
-// create a named stream
+// create a named writable stream
 var stream = mux.create('myName');
 
-// pipe data to the stream,
+// pipe data to the stream
 fs.createReadStream('test/fixtures/lorem.txt').pipe(stream);
 
 ````
