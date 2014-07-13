@@ -4,7 +4,7 @@
 
 > Multiplex multiple binary streams over a single carrier.
 
-Simple uni-directional stream multiplexer: send streams over a stream. Handy for inter-process streams.
+Simple uni-directional stream multiplexer: send streams over a stream.
 
 :warning: Early release, handle with care :sunglasses:
 
@@ -16,7 +16,7 @@ Simple uni-directional stream multiplexer: send streams over a stream. Handy for
 
 ## Alternatives
 
-I've used [multiplex](https://www.npmjs.org/package/multiplex) for some time, but had some weird decoding issues. As a bonus the recursive decoding broke my stack when streaming large amounts of very small chunks. I could't find how to fix this in the more complex logic and it's dependencies.
+I've used [multiplex](https://www.npmjs.org/package/multiplex) for some time, but had some weird decoding issues. Besides some null bytes errors the recursive decoding broke my stack when streaming large amounts of very small chunks. I couldn't find how to fix this in the more complex logic and it's dependencies.
 
 Since I don't need duplex functionality I created mplex to mirror the same API but with a simpler (naïve?) implementation.
 
