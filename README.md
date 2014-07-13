@@ -1,10 +1,12 @@
-# mplex
+# muxie
 
-[![Build Status](https://secure.travis-ci.org/Bartvds/mplex.svg?branch=master)](http://travis-ci.org/Bartvds/mplex) [![NPM version](https://badge.fury.io/js/mplex.svg)](http://badge.fury.io/js/mplex) [![Dependency Status](https://david-dm.org/Bartvds/mplex.svg)](https://david-dm.org/Bartvds/mplex) [![devDependency Status](https://david-dm.org/Bartvds/mplex/dev-status.svg)](https://david-dm.org/Bartvds/mplex#info=devDependencies)
+[![Build Status](https://secure.travis-ci.org/Bartvds/muxie.svg?branch=master)](http://travis-ci.org/Bartvds/muxie) [![NPM version](https://badge.fury.io/js/muxie.svg)](http://badge.fury.io/js/muxie) [![Dependency Status](https://david-dm.org/Bartvds/muxie.svg)](https://david-dm.org/Bartvds/muxie) [![devDependency Status](https://david-dm.org/Bartvds/muxie/dev-status.svg)](https://david-dm.org/Bartvds/muxie#info=devDependencies)
 
-> Multiplex multiple binary streams over a single carrier.
+> Simple uni-directional stream multiplexer: send multiple streams over a single carrier.
 
-Simple uni-directional stream multiplexer: send streams over a stream.
+Setup the muxer and pipe it to the demuxer.
+
+Then get multiple named writable streams from the muxer, pipe data into them and the demuxer receives the named readable streams that will emit the data.
 
 :warning: Early release, handle with care :sunglasses:
 
@@ -18,7 +20,7 @@ Simple uni-directional stream multiplexer: send streams over a stream.
 
 I've used [multiplex](https://www.npmjs.org/package/multiplex) for some time, but had some weird decoding issues. Besides some null bytes errors the recursive decoding broke my stack when streaming large amounts of very small chunks. I couldn't find how to fix this in the more complex logic and it's dependencies.
 
-Since I don't need duplex functionality I created mplex to mirror the same API but with a simpler (naïve?) implementation.
+Since I don't need duplex functionality I created muxie to mirror the same API but with a simpler (naïve?) implementation.
 
 
 ## Todo
@@ -30,31 +32,28 @@ Since I don't need duplex functionality I created mplex to mirror the same API b
 ## Install
 
 ````bash
-$ npm install mplex
+$ npm install muxie
 ````
 
 ## Usage
 
 ````js
-var mplex = require('mplex');
+var muxie = require('muxie');
 
 // create a demuxer that will receive new streams
-var demux = mplex.demuxer(function (stream, name) {
+var demux = muxie.demuxer(function (stream, name) {
 	// received a new readable stream
-	stream.on('data', function(err) {
-		//
-	});
+	// ..
 });
 
 // create muxer
-var mux = mplex.muxer();
+var mux = muxie.muxer();
 
 // create a named writable stream
-var stream = mux.create('myName');
+var stream = mux.create('myStream');
 
 // pipe data to the stream
 fs.createReadStream('test/fixtures/lorem.txt').pipe(stream);
-
 ````
 
 ## Build
@@ -76,7 +75,7 @@ See the `Gruntfile.js` for additional commands.
 
 ## Contributions
 
-They are welcome but please discuss in [the issues](https://github.com/Bartvds/mplex/issues) before you commit to large changes. If you send a PR make sure you code is idiomatic and linted.
+They are welcome but please discuss in [the issues](https://github.com/Bartvds/muxie/issues) before you commit to large changes. If you send a PR make sure you code is idiomatic and linted.
 
 
 ## History

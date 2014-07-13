@@ -1,5 +1,5 @@
 {
-  "name": "mplex",
+  "name": "muxie",
   "version": "0.0.1",
   "description": "Multiplex binary streams over a single carrier.",
   "keywords": [
@@ -7,10 +7,10 @@
     "binary",
     "stream"
   ],
-  "homepage": "https://github.com/Bartvds/mplex",
+  "homepage": "https://github.com/Bartvds/muxie",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Bartvds/mplex.git"
+    "url": "https://github.com/Bartvds/muxie.git"
   },
   "author": {
     "name": "Bart van der Schoor",
@@ -19,11 +19,11 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/Bartvds/mplex/master/LICENSE-MIT"
+      "url": "https://raw.github.com/Bartvds/muxie/master/LICENSE-MIT"
     }
   ],
   "bugs": {
-    "url": "https://github.com/Bartvds/mplex/issues"
+    "url": "https://github.com/Bartvds/muxie/issues"
   },
   "engines": {
     "node": ">= 0.10.0"
