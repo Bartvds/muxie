@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/Bartvds/muxie.svg?branch=master)](http://travis-ci.org/Bartvds/muxie) [![NPM version](https://badge.fury.io/js/muxie.svg)](http://badge.fury.io/js/muxie) [![Dependency Status](https://david-dm.org/Bartvds/muxie.svg)](https://david-dm.org/Bartvds/muxie) [![devDependency Status](https://david-dm.org/Bartvds/muxie/dev-status.svg)](https://david-dm.org/Bartvds/muxie#info=devDependencies)
 
-> Simple uni-directional stream multiplexer: send multiple streams over a single carrier.
+> Simple directional stream multiplexer: send multiple streams over a single carrier.
 
 Setup the muxer and pipe it to the demuxer.
 

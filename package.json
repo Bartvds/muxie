@@ -1,9 +1,10 @@
 {
   "name": "muxie",
   "version": "0.0.1",
-  "description": "Multiplex binary streams over a single carrier.",
+  "description": "Simple directional stream multiplexer: send multiple streams over a single carrier.",
   "keywords": [
     "multiplex",
+    "multiplexer",
     "binary",
     "stream"
   ],
