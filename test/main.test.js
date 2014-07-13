@@ -1,5 +1,8 @@
 'use strict';
 
+/* jshint -W098 */
+/* jshint -W089 */
+
 var fs = require('fs');
 var path = require('path');
 var stream = require('stream');
@@ -57,6 +60,18 @@ function blockgen(size, amount) {
 	return readable;
 }
 
+function errorAfter(message, amount) {
+	return through2(function (chunk, enc, done) {
+		this.push(chunk);
+		amount -= chunk.length;
+		/*if (amount <= 0) {
+			console.log('push error');
+			this.emit('error', new Error(message));
+		}*/
+		done();
+	});
+}
+
 describe('basics', function () {
 
 	var sources = {
@@ -66,21 +81,21 @@ describe('basics', function () {
 	};
 
 	it('creates named substream', function (done) {
-		var left = mplex.sender();
-		var right = mplex.receiver(function (stream, name) {
+		var mux = mplex.muxer();
+		var demux = mplex.demuxer(function (stream, name) {
 			assert.isObject(stream, 'lorem');
 			assert.strictEqual(name, 'lorem');
 			done();
 		});
-		//left.pipe(log('lr')).pipe(right);
-		left.pipe(chunky(2)).pipe(right);
-		left.create('lorem');
+		//mux.pipe(log('lr')).pipe(demux);
+		mux.pipe(chunky(2)).pipe(demux);
+		mux.create('lorem');
 	});
 
 	it('streams single stream', function (done) {
-		var left = mplex.sender();
+		var mux = mplex.muxer();
 
-		var right = mplex.receiver(function (stream, id) {
+		var demux = mplex.demuxer(function (stream, id) {
 			assert.isObject(stream, 'lorem');
 			assert.strictEqual(id, 'lorem');
 
@@ -91,20 +106,20 @@ describe('basics', function () {
 			});
 		});
 
-		var lorem = left.create('lorem');
+		var lorem = mux.create('lorem');
 
-		left.pipe(chunky(64)).pipe(right);
+		mux.pipe(chunky(64)).pipe(demux);
 
 		fs.createReadStream('test/fixtures/lorem.txt').pipe(chunky(20)).pipe(lorem);
 	});
 
 	it('streams single fat stream', function (done) {
-		var left = mplex.sender();
+		var mux = mplex.muxer();
 
 		var size = 10 * 1024 * 1024;
 		var amount = 10;
 
-		var right = mplex.receiver(function (stream, id) {
+		var demux = mplex.demuxer(function (stream, id) {
 			assert.isObject(stream, 'blocks');
 			assert.strictEqual(id, 'blocks');
 
@@ -115,17 +130,17 @@ describe('basics', function () {
 			});
 		});
 
-		var sink = left.create('blocks');
+		var sink = mux.create('blocks');
 
-		left.pipe(chunky(size / 20)).pipe(right);
+		mux.pipe(chunky(size / 20)).pipe(demux);
 
 		blockgen(size, amount).pipe(sink);
 	});
 
 	it('streams multiple streams', function (done) {
-		var left = mplex.sender();
+		var mux = mplex.muxer();
 
-		var right = mplex.receiver(function (stream, id) {
+		var demux = mplex.demuxer(function (stream, id) {
 			assert.isObject(stream, id);
 
 			streamToBuffer(stream, function (err, buffer) {
@@ -141,12 +156,12 @@ describe('basics', function () {
 		});
 
 		var test = {
-			lorem: left.create('lorem'),
-			bacon: left.create('bacon'),
-			hipster: left.create('hipster')
+			lorem: mux.create('lorem'),
+			bacon: mux.create('bacon'),
+			hipster: mux.create('hipster')
 		};
 
-		left.pipe(chunky(64)).pipe(right);
+		mux.pipe(chunky(64)).pipe(demux);
 
 		fs.createReadStream('test/fixtures/lorem.txt').pipe(test.lorem);
 		fs.createReadStream('test/fixtures/bacon.txt').pipe(test.bacon);
@@ -154,9 +169,9 @@ describe('basics', function () {
 	});
 
 	it('streams multiple mixed streams', function (done) {
-		var left = mplex.sender();
+		var mux = mplex.muxer();
 
-		var right = mplex.receiver(function (stream, id) {
+		var demux = mplex.demuxer(function (stream, id) {
 			assert.isObject(stream, id);
 
 			streamToBuffer(stream, function (err, buffer) {
@@ -172,19 +187,40 @@ describe('basics', function () {
 		});
 
 		var test = {
-			lorem: left.create('lorem'),
-			bacon: left.create('bacon'),
-			hipster: left.create('hipster')
+			lorem: mux.create('lorem'),
+			bacon: mux.create('bacon'),
+			hipster: mux.create('hipster')
 		};
 
-		left.pipe(chunky(64)).pipe(right);
+		mux.pipe(chunky(64)).pipe(demux);
 
 		fs.createReadStream('test/fixtures/lorem.txt').pipe(chunky(4, 10)).pipe(test.lorem);
 		setTimeout(function () {
 			fs.createReadStream('test/fixtures/bacon.txt').pipe(chunky(5, 15)).pipe(test.bacon);
-		}, 5)
+		}, 5);
 		setTimeout(function () {
 			fs.createReadStream('test/fixtures/hipster.txt').pipe(chunky(4, 5)).pipe(test.hipster);
-		}, 10)
+		}, 10);
+	});
+
+	it.skip('notifies on error', function (done) {
+		var mux = mplex.muxer();
+
+		var demux = mplex.demuxer(function (stream, id) {
+			assert.isObject(stream, id);
+
+			stream.on('error', function(err) {
+				assert.isObject(err);
+			});
+			stream.on('data', function(err) {
+				//
+			});
+		});
+
+		var sink = mux.create('blocks');
+
+		mux.pipe(chunky(30)).pipe(demux);
+
+		blockgen(64, 10).pipe(errorAfter(100)).pipe(sink);
 	});
 });
